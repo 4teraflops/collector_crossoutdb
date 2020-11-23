@@ -4,6 +4,7 @@ import time
 import sqlite3
 from src.config import webhook_url, admin_id  # Да, pycharm ругается, но это работает.
 import json
+from json import JSONDecodeError
 from loguru import logger
 
 db_path = 'src/db.sqlite'  # БД лежит в той же папке
@@ -247,7 +248,13 @@ if __name__ == '__main__':
         #logger.info('Program has been stop manually')
     except IndexError:
         logger.error(f'IndexError Exception')
+    except JSONDecodeError:  # Исключение на случай, если сервер вернет херню
+        time.sleep(350)
+        text = 'JSONDecodeError. Script paused to 5 min.'
+        logger.error(text)
+        do_alarm(text)
     except Exception as e:
         t_alarmtext = f'Crossout_helper (app_collector.py):\n {str(e)}'
         do_alarm(t_alarmtext)
         logger.error(f'Other except error Exception')
+
